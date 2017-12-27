@@ -3,8 +3,10 @@
 const express = require('express');
 const morganLogger = require('morgan');
 const bodyParser = require('body-parser');
+const config = require('./lib/config');
 const logger = require('./lib/logger');
 const errors = require('./lib/errors');
+const AgentApi = require('./lib/agent').AgentApi;
 const NotFound = errors.NotFound;
 
 const app = express();
@@ -15,7 +17,8 @@ app.use(morganLogger('combined', {
 app.use(bodyParser.json());
 
 // allowed routes
-app.use('/v1', require('./lib/routes/agent_v1'));
+app.use(`/v${config.agent.version}`, require('./lib/routes/agent_router'));
+app.get('/info', AgentApi.getInfo);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => next(new NotFound()));
